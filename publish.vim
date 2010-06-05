@@ -42,7 +42,7 @@ function! Publish(source, target, files) abort
     let given_source = s:FindOriginalPath(source_path)
     let s:current_source_directory = fnamemodify(given_source, ':h')
     silent execute 'edit!' fnameescape(source_path)
-    execute 'doautocmd bufreadpost' fnameescape(source_path)
+    silent execute 'doautocmd User PublishPre' fnameescape(source_path)
     if g:publish_plaintext
       let plaintext_path = xolox#path#merge(a:target, pathname . '.txt')
       silent execute 'write!' fnameescape(plaintext_path)
