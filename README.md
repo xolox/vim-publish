@@ -18,9 +18,23 @@ wondering what the result looks like, I've published [the plug-in source code]
 
 Unzip the most recent [ZIP archive] [zip] file inside your Vim profile
 directory (usually this is `~/.vim` on UNIX and `%USERPROFILE%\vimfiles` on
-Windows), restart Vim and try it out. Create a Vim script that calls the
-function `Publish()` as follows:
+Windows). As an example we'll publish the plug-in using itself. First create a
+tags file that contains entries for the files you want to publish using a shell
+command such as:
 
+    ctags -Rf ~/.publish_tags ~/.vim/
+
+If this doesn't work because `ctags` isn't installed you can download it from
+the [Exuberant Ctags homepage] [ctags], or if you're running Debian/Ubuntu you
+can install it by executing the following shell command:
+
+    sudo apt-get install exuberant-ctags
+
+The plug-in needs an up-to-date tags file so that it create hyperlinks between
+the published files. Now start Vim and write a script that registers the tags
+file you just created and calls the function `Publish()` as follows:
+
+    set tags=~/.publish_tags
     let sources = '/home/peter/.vim'
     let target = 'sftp://peterodding.com/code/vim/profile'
     call Publish(sources, target, [
@@ -30,11 +44,11 @@ function `Publish()` as follows:
         \ 'plugin/publish.vim',
         \ ])
 
-Change the `sources` and `target` variables to reflect your situation, save
-your script as `~/publish_test.vim` and you can execute the script in Vim by
-typing `:source ~/publish_test.vim` and pressing `Enter↵`. If everything goes
-well Vim will be busy for a moment and after that you will find a bunch of
-syntax highlighted, interlinked HTML documents in the `target` directory!
+Change the `sources` and `target` variables to reflect your situation, save the
+script as `~/publish_test.vim` and execute it in Vim by typing `:source
+~/publish_test.vim` and pressing `Enter↵`. If everything goes well Vim will be
+busy for a moment and after that you will find a bunch of syntax highlighted,
+interlinked HTML documents in the `target` directory!
 
 ## Contact
 
