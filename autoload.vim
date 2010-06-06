@@ -1,9 +1,9 @@
 " Vim script
 " Maintainer: Peter Odding <peter@peterodding.com>
-" Last Change: June 5, 2010
+" Last Change: June 6, 2010
 " URL: http://peterodding.com/code/vim/publish
 
-function! publish#resolve_files(directory, pathnames)
+function! publish#resolve_files(directory, pathnames) " {{{1
   " Create a dictionary that maps the fully resolved pathnames of the files to
   " be published to the absolute pathnames provided by the user. This enables
   " the script to gracefully handle symbolic links which I use a lot :-)
@@ -145,9 +145,9 @@ function! publish#prep_env(enable) " {{{1
 
   " Avoid triggering automatic commands intended to update `Last changed'
   " headers and such by executing :write commands, because the source files
-  " aren't actually modified but only copied. I can't use the :noautocmd
-  " command fir this because that would disable remote publishing through
-  " the netrw plug-in! Therefor I've resorted to the following:
+  " aren't actually modified but only copied. I can't use :noautocmd :write
+  " for this because that would disable remote publishing through the netrw
+  " plug-in! Therefor I've resorted to the following:
   if a:enable
     let s:ei_save = &eventignore
     set eventignore=BufWritePre
