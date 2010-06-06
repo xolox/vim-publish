@@ -69,7 +69,12 @@ function! s:pattern_to_lnum(entry, pathname) " {{{2
      let contents = s:cached_contents[a:pathname]
     endif
     let pattern = substitute(a:entry.cmd, '^/\(.*\)/$', '\1', '')
-    let index = match(contents, pattern)
+    let pattern = substitute(pattern, '\~', '\\~', 'g')
+    try
+      let index = match(contents, pattern)
+    catch
+      throw "Failed pattern: " . string(pattern)
+    endtry
     if index >= 0
       let lnum = index + 1
       let a:entry.cmd = string(lnum)
