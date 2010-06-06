@@ -1,6 +1,6 @@
 " Vim plug-in
 " Maintainer: Peter Odding <peter@peterodding.com>
-" Last Change: June 5, 2010
+" Last Change: June 6, 2010
 " URL: http://peterodding.com/code/vim/publish
 " License: MIT
 " Version: 1.5
@@ -42,11 +42,11 @@ function! Publish(source, target, files) abort
     let given_source = s:FindOriginalPath(source_path)
     let s:current_source_directory = fnamemodify(given_source, ':h')
     silent execute 'edit!' fnameescape(source_path)
-    silent execute 'doautocmd User PublishPre' fnameescape(source_path)
     if g:publish_plaintext
       let plaintext_path = xolox#path#merge(a:target, pathname . '.txt')
       silent execute 'write!' fnameescape(plaintext_path)
     endif
+    silent execute 'doautocmd User PublishPre'
     runtime syntax/2html.vim
     if exists('tags_to_links_command')
       silent execute tags_to_links_command
