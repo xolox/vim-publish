@@ -30,9 +30,9 @@ can install it by executing the following shell command:
 
     sudo apt-get install exuberant-ctags
 
-The plug-in needs an up-to-date tags file so that it create hyperlinks between
-the published files. Now start Vim and write a script that registers the tags
-file you just created and calls the function `Publish()` as follows:
+The plug-in needs an up-to-date tags file so that it can create hyperlinks
+between the published files. Now start Vim and write a script that registers
+the tags file you just created and calls the function `Publish()` as follows:
 
     set tags=~/.publish_tags
     let sources = '/home/peter/.vim'
