@@ -27,10 +27,10 @@ $(VIMDOC): Makefile README.md
 	@mkd2vimdoc.py `basename $(VIMDOC)` < README.md > $(VIMDOC)
 
 # This rule converts the Markdown README to HTML, which reads easier.
-$(HTMLDOC): Makefile README.md
+$(HTMLDOC): Makefile README.md doc/README.header doc/README.footer
 	@echo "Creating \`$(HTMLDOC)' .."
 	@cat doc/README.header > $(HTMLDOC)
-	@markdown README.md >> $(HTMLDOC)
+	@cat README.md | markdown | SmartyPants >> $(HTMLDOC)
 	@cat doc/README.footer >> $(HTMLDOC)
 
 # This is only useful for myself, it uploads the latest README to my website.
