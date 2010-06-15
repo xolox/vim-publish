@@ -30,11 +30,11 @@ function! publish#find_tags(files_to_publish) " {{{1
         let tags_to_publish[entry.name] = entry
       else
         let num_duplicates += 1
+        let other = tags_to_publish[entry.name]
+        if entry.filename == other.filename && entry.lnum < other.lnum
+          let tags_to_publish[entry.name] = entry
+        endif
         if num_duplicates <= 3
-          let other = tags_to_publish[entry.name]
-          if entry.filename == other.filename && entry.lnum < other.lnum
-            let tags_to_publish[entry.name] = entry
-          endif
           let tag_name = string(entry.name)
           let this_path = string(entry.filename)
           let other_path = string(other.filename)
