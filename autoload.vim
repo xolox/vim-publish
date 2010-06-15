@@ -1,6 +1,6 @@
 " Vim script
 " Maintainer: Peter Odding <peter@peterodding.com>
-" Last Change: June 6, 2010
+" Last Change: June 15, 2010
 " URL: http://peterodding.com/code/vim/publish
 
 function! publish#resolve_files(directory, pathnames) " {{{1
@@ -25,22 +25,23 @@ function! publish#find_tags(files_to_publish) " {{{1
   let s:cached_contents = {}
   for entry in taglist('.')
     let pathname = xolox#path#absolute(entry.filename)
-    if has_key(a:files_to_publish, pathname)
-      call s:pattern_to_lnum(entry, pathname)
-      if entry.cmd =~ '^\d\+$'
-        if !has_key(tags_to_publish, entry.name)
-          let tags_to_publish[entry.name] = entry
-        else
-          let num_duplicates += 1
-          if num_duplicates <= 3
-            let tag_name = string(entry.name)
-            let this_path = string(entry.filename)
-            let other_path = string(tags_to_publish[entry.name].filename)
-            let msg = "publish.vim: Ignoring duplicate tag %s! (duplicate is in %s, first was in %s)"
-            echohl warningmsg
-            echomsg printf(msg, tag_name, this_path, other_path)
-            echohl none
+    if has_key(a:files_to_publish, pathname) && s:pattern_to_lnum(entry, pathname)
+      if !has_key(tags_to_publish, entry.name)
+        let tags_to_publish[entry.name] = entry
+      else
+        let num_duplicates += 1
+        if num_duplicates <= 3
+          let other = tags_to_publish[entry.name]
+          if entry.filename == other.filename && entry.lnum < other.lnum
+            let tags_to_publish[entry.name] = entry
           endif
+          let tag_name = string(entry.name)
+          let this_path = string(entry.filename)
+          let other_path = string(other.filename)
+          let msg = "publish.vim: Ignoring duplicate tag %s! (duplicate is in %s, first was in %s)"
+          echohl warningmsg
+          echomsg printf(msg, tag_name, this_path, other_path)
+          echohl none
         endif
       endif
     endif
@@ -61,7 +62,10 @@ function! s:pattern_to_lnum(entry, pathname) " {{{2
   " search patterns. Since search patterns are more flexible I use those, but
   " the plug-in needs absolute line numbers, so this function converts search
   " patterns into line numbers.
-  if a:entry.cmd !~ '^\d\+$'
+  if a:entry.cmd =~ '^\d\+$'
+    let a:entry.lnum = a:entry.cmd + 0
+    return 1
+  else
     if !has_key(s:cached_contents, a:pathname)
       let contents = readfile(a:pathname)
       let s:cached_contents[a:pathname] = contents
@@ -76,8 +80,8 @@ function! s:pattern_to_lnum(entry, pathname) " {{{2
       throw "Failed pattern: " . string(pattern)
     endtry
     if index >= 0
-      let lnum = index + 1
-      let a:entry.cmd = string(lnum)
+      let a:entry.lnum = index + 1
+      return 1
     endif
   endif
 endfunction
@@ -91,19 +95,38 @@ function! publish#create_subst_cmd(tags_to_publish) " {{{1
   "   foo#bar#<span class=Normal>baz</span>
   " 
   let patterns = []
-  let ignore_html = '\%%(<[^/][^>]*>%s</[^>]\+>\|%s\)'
   for name in keys(a:tags_to_publish)
     let tokens = []
     for token in split(name, '\W\@=\|\W\@<=')
       let escaped = xolox#escape#pattern(token)
-      call add(tokens, printf(ignore_html, token, token))
+      call add(tokens, s:ignore_html(token))
     endfor
+    let entry = a:tags_to_publish[name]
+    if g:publish_viml_sl_hack && get(entry, 'language') == 'Vim'
+      let subpattern = '\s\(s:\|<[Ss][Ii][Dd]>\)' . name . '\s*('
+      if get(entry, 'cmd') =~ subpattern
+        if !exists('s:viml_sl_prefix')
+          let s:viml_sl_prefix = s:nasty()
+        endif
+        call insert(tokens, s:viml_sl_prefix)
+      endif
+    endif
     call add(patterns, join(tokens, ''))
   endfor
   let tag_names_pattern = escape(join(patterns, '\|'), '/')
   " Gotcha: Use \w\@<! and \w\@! here instead of \< and \> which won't work.
   return '%s/[A-Za-z0-9_]\@<!\%(' . tag_names_pattern . '\)[A-Za-z0-9_]\@!/\=s:ConvertTagToLink(submatch(0))/eg'
-  return '%s/\w\@<!\%(' . tag_names_pattern . '\)\w\@!/\=s:ConvertTagToLink(submatch(0))/eg'
+endfunction
+
+function! s:ignore_html(s)
+  return printf('\%%(<[^/][^>]*>%s</[^>]\+>\|%s\)', a:s, a:s)
+endfunction
+
+function! s:nasty()
+  " return '\%(s:\|&lt;[Ss][Ii][Dd]&gt;\)'
+  let short = s:ignore_html('s') . s:ignore_html(':')
+  let long = s:ignore_html('&lt;') . s:ignore_html('[Ss][Ii][Dd]') . s:ignore_html('&gt;')
+  return '\%(' . short . '\|' . long . '\)'
 endfunction
 
 function! publish#create_dirs(target_path) " {{{1

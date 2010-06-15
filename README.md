@@ -69,4 +69,4 @@ This software is licensed under the [MIT license] [license].<br>
 [license]: http://en.wikipedia.org/wiki/MIT_License
 [vim]: http://www.vim.org/
 [vim_scripts_entry]: http://www.vim.org/scripts/script.php?script_id=2252
-[zip]: http://github.com/downloads/xolox/vim-publish/publish-latest.zip
+[zip]: http://peterodding.com/code/vim/download.php?script=publish

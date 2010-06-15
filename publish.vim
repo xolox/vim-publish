@@ -1,6 +1,6 @@
 " Vim plug-in
 " Maintainer: Peter Odding <peter@peterodding.com>
-" Last Change: June 6, 2010
+" Last Change: June 15, 2010
 " URL: http://peterodding.com/code/vim/publish
 " License: MIT
 " Version: 1.5
@@ -19,6 +19,10 @@ endif
 
 if !exists('g:publish_plaintext')
   let g:publish_plaintext = 0
+endif
+
+if !exists('g:publish_viml_sl_hack')
+  let g:publish_viml_sl_hack = 1
 endif
 
 function! Publish(source, target, files) abort
@@ -82,13 +86,19 @@ function! s:ConvertTagToLink(name) " {{{1
   " work on the local file system just as well as on a web server.
   try
     " Strip HTML from matched text and use result to find tag info.
-    let entry = s:tags_to_publish[substitute(a:name, '<[^>]\+>', '', 'g')]
+    let text = substitute(a:name, '<[^>]\+>', '', 'g')
+    if has_key(s:tags_to_publish, text)
+      let entry = s:tags_to_publish[text]
+    else
+      let text = substitute(text, '^\(s:\|&lt;[Ss][Ii][Dd]&gt;\)', '', 'g')
+      let entry = s:tags_to_publish[text]
+    endif
     " Convert the fully resolved pathname back into the one given by the user.
     let pathname = s:FindOriginalPath(entry.filename)
     " Now convert that pathname into a relative hyperlink with an anchor.
     let relative = xolox#path#relative(pathname, s:current_source_directory)
     let suffix = g:publish_omit_dothtml ? '' : '.html'
-    return '<a href="' . relative . suffix . '#l' . entry.cmd . '">' . a:name . '</a>'
+    return '<a href="' . relative . suffix . '#l' . entry.lnum . '">' . a:name . '</a>'
   catch
     return a:name
   endtry
