@@ -1,9 +1,9 @@
 " Vim plug-in
 " Maintainer: Peter Odding <peter@peterodding.com>
-" Last Change: June 15, 2010
+" Last Change: June 16, 2010
 " URL: http://peterodding.com/code/vim/publish
 " License: MIT
-" Version: 1.5
+" Version: 1.6
 
 " Support for automatic update using the GLVS plug-in.
 " GetLatestVimScripts: 2252 1 :AutoInstall: publish.zip
@@ -26,18 +26,24 @@ if !exists('g:publish_viml_sl_hack')
 endif
 
 function! Publish(source, target, files) abort
-  call s:Message("Preparing to publish file%s ..", len(a:files) == 1 ? '' : 's')
+  let start = xolox#timer#start()
+  call xolox#message("Preparing to publish file%s ..", len(a:files) == 1 ? '' : 's')
   let s:files_to_publish = publish#resolve_files(a:source, a:files)
   let s:tags_to_publish = publish#find_tags(s:files_to_publish)
   if s:tags_to_publish != {}
     let tags_to_links_command = publish#create_subst_cmd(s:tags_to_publish)
   endif
+  let rsync_target = publish#rsync_check(a:target)
+  if rsync_target != ''
+    let rsync_dir = xolox#path#tempdir()
+  endif
+  let target_dir = rsync_target != '' ? rsync_dir : a:target
   call publish#prep_env(1)
   for pathname in a:files
     let source_path = xolox#path#merge(a:source, pathname)
     let suffix = g:publish_omit_dothtml ? '' : '.html'
-    let target_path = xolox#path#merge(a:target, pathname . suffix)
-    call s:Message("Publishing %s", string(pathname))
+    let target_path = xolox#path#merge(target_dir, pathname . suffix)
+    call xolox#message("Publishing %s", string(pathname))
     if !publish#create_dirs(target_path)
       return
     endif
@@ -47,7 +53,7 @@ function! Publish(source, target, files) abort
     let s:current_source_directory = fnamemodify(given_source, ':h')
     silent execute 'edit!' fnameescape(source_path)
     if g:publish_plaintext
-      let plaintext_path = xolox#path#merge(a:target, pathname . '.txt')
+      let plaintext_path = xolox#path#merge(target_dir, pathname . '.txt')
       silent execute 'write!' fnameescape(plaintext_path)
     endif
     silent execute 'doautocmd User PublishPre'
@@ -61,23 +67,17 @@ function! Publish(source, target, files) abort
   endfor
   call publish#prep_env(0)
   unlet s:files_to_publish s:tags_to_publish
-  let [msg, nfiles] = ["publish.vim: Published %i file%s to %s.", len(a:files)]
-  call s:Message(msg, nfiles, nfiles == 1 ? '' : 's', string(a:target))
+  if rsync_target != ''
+    call publish#run_rsync(rsync_target, rsync_dir)
+  endif
+  let msg = "publish.vim: Published %i file%s to %s."
+  call xolox#message(msg, len(a:files), len(a:files) == 1 ? '' : 's', a:target)
+  call xolox#timer#stop("Finished publishing files in %s.", start)
 endfunction
 
 function! s:FindOriginalPath(pathname) " {{{1
   let key = xolox#path#absolute(a:pathname)
   return get(s:files_to_publish, key, '')
-endfunction
-
-function! s:Message(...) " {{{1
-  try
-    redraw
-    echohl title
-    echomsg call('printf', a:000)
-  finally
-    echohl none
-  endtry
 endfunction
 
 function! s:ConvertTagToLink(name) " {{{1
@@ -96,6 +96,7 @@ function! s:ConvertTagToLink(name) " {{{1
     " Convert the fully resolved pathname back into the one given by the user.
     let pathname = s:FindOriginalPath(entry.filename)
     " Now convert that pathname into a relative hyperlink with an anchor.
+    " TODO This is likely to be slow so cache the results?!
     let relative = xolox#path#relative(pathname, s:current_source_directory)
     let suffix = g:publish_omit_dothtml ? '' : '.html'
     return '<a href="' . relative . suffix . '#l' . entry.lnum . '">' . a:name . '</a>'

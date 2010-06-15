@@ -50,6 +50,25 @@ script as `~/publish_test.vim` and execute it in Vim by typing `:source
 busy for a moment and after that you will find a bunch of syntax highlighted,
 interlinked HTML documents in the `target` directory!
 
+## Publishing to a remote location (website)
+
+As you can see from the example above it's possible to publish files directly
+to your web server using the [netrw.vim plug-in] [netrw] that's bundled with
+Vim, simply by starting the `target` path with `sftp://`. All you need for this
+to work is the ability to establish [SCP] [scp] connections to your server.
+There are however two disadvantages to remote publishing over [SFTP] [sftp]:
+
+1. The `publish.vim` plug-in can't automatically create directories on the
+remote side, which means you'll have to do so by hand -- very bothersome.
+
+2. It can take a while to publish a dozen files because a new connection is
+established for every file that's uploaded to the remote location.
+
+As a workaround to both of these issues the `publish.vim` plug-in will
+automatically use [rsync][rsync] when both the local and remote system have it
+installed. This cuts the time to publish to a remote location in half and
+enables the plug-in to automatically create directories on the remote side.
+
 ## Contact
 
 If you have questions, bug reports, suggestions, etc. the author can be
@@ -67,6 +86,11 @@ This software is licensed under the [MIT license] [license].<br>
 [ctags]: http://ctags.sourceforge.net/
 [demo]: http://peterodding.com/code/vim/profile/plugin/publish.vim
 [license]: http://en.wikipedia.org/wiki/MIT_License
+[netrw]: http://www.vim.org/scripts/script.php?script_id=1075
+[rsync]: http://en.wikipedia.org/wiki/rsync
+[scp]: http://en.wikipedia.org/wiki/Secure_copy
+[sftp]: http://en.wikipedia.org/wiki/SSH_file_transfer_protocol
+[ssh]: http://en.wikipedia.org/wiki/Secure_Shell
 [vim]: http://www.vim.org/
 [vim_scripts_entry]: http://www.vim.org/scripts/script.php?script_id=2252
 [zip]: http://peterodding.com/code/vim/download.php?script=publish

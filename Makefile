@@ -1,5 +1,7 @@
-DEPENDS=$(HOME)/.vim/autoload/xolox/path.vim \
-		$(HOME)/.vim/autoload/xolox/escape.vim
+DEPENDS=autoload/xolox.vim \
+		autoload/xolox/escape.vim \
+		autoload/xolox/timer.vim \
+		autoload/xolox/path.vim
 VIMDOC=doc/publish.txt
 HTMLDOC=doc/readme.html
 ZIPDIR := $(shell mktemp -d)
@@ -14,7 +16,7 @@ archive: Makefile publish.vim autoload.vim $(VIMDOC) $(HTMLDOC)
 	@mkdir -p $(ZIPDIR)/plugin $(ZIPDIR)/autoload/xolox $(ZIPDIR)/doc
 	@cp publish.vim $(ZIPDIR)/plugin
 	@cp autoload.vim $(ZIPDIR)/autoload/publish.vim
-	@cp $(DEPENDS) $(ZIPDIR)/autoload/xolox
+	@for SCRIPT in $(DEPENDS); do cp $$HOME/.vim/$$SCRIPT $(ZIPDIR)/$$SCRIPT; done
 	@cp $(VIMDOC) $(ZIPDIR)/doc/publish.txt
 	@cp $(HTMLDOC) $(ZIPDIR)/doc/publish.html
 	@cd $(ZIPDIR) && zip -r $(ZIPFILE) . >/dev/null

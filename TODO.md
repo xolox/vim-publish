@@ -15,10 +15,6 @@ Here's some things in the nice-to-have department:
    rerun the plug-in when I break my [easytags.vim][easytags] plug-in which
    also breaks the hyperlinking feature of `publish.vim`.
 
- * Create an option to publish to a temporary local directory, create a tarball
-   from the published files, upload the tarball to a remote location and unpack
-   it there because establishing SFTP connections has quite a lot of overhead?
-
 
 [autoindex]: http://peterodding.com/code/vim/profile
 [easytags]: http://peterodding.com/code/vim/easytags

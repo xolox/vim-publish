@@ -39,9 +39,7 @@ function! publish#find_tags(files_to_publish) " {{{1
           let this_path = string(entry.filename)
           let other_path = string(other.filename)
           let msg = "publish.vim: Ignoring duplicate tag %s! (duplicate is in %s, first was in %s)"
-          echohl warningmsg
-          echomsg printf(msg, tag_name, this_path, other_path)
-          echohl none
+          call xolox#warning(msg, tag_name, this_path, other_path)
         endif
       endif
     endif
@@ -49,9 +47,7 @@ function! publish#find_tags(files_to_publish) " {{{1
   if num_duplicates > 3
     let more = num_duplicates - 3
     let msg = "publish.vim: Ignored %s more duplicate tag%s!"
-    echohl warningmsg
-    echomsg printf(msg, more, more == 1 ? '' : 's')
-    echohl none
+    call xolox#warning(msg, more, more == 1 ? '' : 's')
   endif
   unlet s:cached_contents
   return tags_to_publish
@@ -129,6 +125,32 @@ function! s:nasty()
   return '\%(' . short . '\|' . long . '\)'
 endfunction
 
+function! publish#rsync_check(target) " {{{1
+  let matches = matchlist(a:target, '^sftp://\([^/]\+\)\(.*\)$')
+  if len(matches) >= 3
+    let host = matches[1]
+    let path = substitute(matches[2], '^/', '', '')
+    call system('rsync --version')
+    if !v:shell_error
+      call system('ssh ' . host . ' rsync --version')
+      if !v:shell_error
+        return host . ':' . path
+      endif
+    endif
+  endif
+  return ''
+endfunction
+
+function! publish#run_rsync(target, tempdir) " {{{1
+  let target = fnameescape(a:target . '/')
+  let tempdir = fnameescape(a:tempdir . '/')
+  call xolox#message("Publishing files to %s using rsync..", a:target)
+  execute '!rsync -vr' tempdir target
+  if v:shell_error
+    throw "publish.vim: Failed to run rsync!"
+  endif
+endfunction
+
 function! publish#create_dirs(target_path) " {{{1
   " If the directory where the files are published resides on the local file
   " system then try to automatically create any missing directories because
@@ -141,11 +163,11 @@ function! publish#create_dirs(target_path) " {{{1
         let msg = "Failed to create directory %s! What now?"
         if confirm(printf(msg, string(current_directory)), "&Abort\n&Ignore") == 1
           let msg = "publish.vim: Failed to create %s, aborting .."
-          echomsg printf(msg, string(current_directory))
+          call xolox#warning(msg, string(current_directory))
           return 0
         else
           let msg = "publish.vim: Failed to create %s, ignoring .."
-          echomsg printf(msg, string(current_directory))
+          call xolox#warning(msg, string(current_directory))
           continue
         endif
       endif
