@@ -1,6 +1,6 @@
 " Vim script
 " Maintainer: Peter Odding <peter@peterodding.com>
-" Last Change: June 15, 2010
+" Last Change: June 16, 2010
 " URL: http://peterodding.com/code/vim/publish
 
 function! publish#resolve_files(directory, pathnames) " {{{1
@@ -187,6 +187,14 @@ function! publish#prep_env(enable) " {{{1
       autocmd SwapExists * let v:swapchoice = 'e'
     endif
   augroup END
+
+  " Avoid the hit-enter prompt!
+  if a:enable
+    let s:more_save = &more
+    set nomore
+  else
+    let &more = s:more_save
+  endif
 
   " Avoid triggering automatic commands intended to update `Last changed'
   " headers and such by executing :write commands, because the source files

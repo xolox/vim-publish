@@ -65,7 +65,6 @@ function! Publish(source, target, files) abort
     silent execute 'write!' fnameescape(target_path)
     bwipeout!
   endfor
-  call publish#prep_env(0)
   unlet s:files_to_publish s:tags_to_publish
   if rsync_target != ''
     call publish#run_rsync(rsync_target, rsync_dir)
@@ -73,6 +72,7 @@ function! Publish(source, target, files) abort
   let msg = "publish.vim: Published %i file%s to %s."
   call xolox#message(msg, len(a:files), len(a:files) == 1 ? '' : 's', a:target)
   call xolox#timer#stop("Finished publishing files in %s.", start)
+  call publish#prep_env(0)
 endfunction
 
 function! s:FindOriginalPath(pathname) " {{{1
