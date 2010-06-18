@@ -93,4 +93,4 @@ This software is licensed under the [MIT license] [license].<br>
 [ssh]: http://en.wikipedia.org/wiki/Secure_Shell
 [vim]: http://www.vim.org/
 [vim_scripts_entry]: http://www.vim.org/scripts/script.php?script_id=2252
-[zip]: http://peterodding.com/code/vim/download.php?script=publish
+[zip]: http://peterodding.com/code/vim/downloads/publish
