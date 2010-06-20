@@ -1,6 +1,6 @@
 " Vim script
 " Maintainer: Peter Odding <peter@peterodding.com>
-" Last Change: June 16, 2010
+" Last Change: June 20, 2010
 " URL: http://peterodding.com/code/vim/publish
 
 function! publish#resolve_files(directory, pathnames) " {{{1
@@ -20,6 +20,7 @@ function! publish#find_tags(files_to_publish) " {{{1
   " Given a dictionary like the one created above, this function will filter
   " the results of taglist() to remove irrelevant entries. In the process tag
   " search ex-commands are converted into line numbers.
+  let start = xolox#timer#start()
   let num_duplicates = 0
   let tags_to_publish = {}
   let s:cached_contents = {}
@@ -50,6 +51,9 @@ function! publish#find_tags(files_to_publish) " {{{1
     call xolox#warning(msg, more, more == 1 ? '' : 's')
   endif
   unlet s:cached_contents
+  let msg = "publish.vim: Found %i tag%s to publish in %s."
+  let numtags = len(tags_to_publish)
+  call xolox#timer#stop(msg, numtags, numtags != 1 ? 's' : '', start)
   return tags_to_publish
 endfunction
 
@@ -126,6 +130,8 @@ function! s:nasty()
 endfunction
 
 function! publish#rsync_check(target) " {{{1
+  let start = xolox#timer#start()
+  let result = ''
   let matches = matchlist(a:target, '^sftp://\([^/]\+\)\(.*\)$')
   if len(matches) >= 3
     let host = matches[1]
@@ -134,18 +140,21 @@ function! publish#rsync_check(target) " {{{1
     if !v:shell_error
       call system('ssh ' . host . ' rsync --version')
       if !v:shell_error
-        return host . ':' . path
+        let result = host . ':' . path
       endif
     endif
   endif
-  return ''
+  call xolox#timer#stop("publish.vim: Checked rsync support in %s.", start)
+  return result
 endfunction
 
 function! publish#run_rsync(target, tempdir) " {{{1
+  let start = xolox#timer#start()
   let target = fnameescape(a:target . '/')
   let tempdir = fnameescape(a:tempdir . '/')
-  call xolox#message("Publishing files to %s using rsync..", a:target)
+  call xolox#message("publish.vim: Uploading files to %s using rsync.", a:target)
   execute '!rsync -vr' tempdir target
+  call xolox#timer#stop("publish.vim: Finished uploading in %s.", start)
   if v:shell_error
     throw "publish.vim: Failed to run rsync!"
   endif

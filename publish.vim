@@ -1,6 +1,6 @@
 " Vim plug-in
 " Maintainer: Peter Odding <peter@peterodding.com>
-" Last Change: June 16, 2010
+" Last Change: June 20, 2010
 " URL: http://peterodding.com/code/vim/publish
 " License: MIT
 " Version: 1.6
@@ -57,9 +57,15 @@ function! Publish(source, target, files) abort
       silent execute 'write!' fnameescape(plaintext_path)
     endif
     silent execute 'doautocmd User PublishPre'
+    let highlight_start = xolox#timer#start()
     runtime syntax/2html.vim
+    let msg = "publish.vim: The 2html.vim script took %s to highlight %s."
+    call xolox#timer#stop(msg, highlight_start, pathname)
     if exists('tags_to_links_command')
+      let tags_to_links_start = xolox#timer#start()
       silent execute tags_to_links_command
+      let msg = "publish.vim: Finished converting tags in %s to links in %s."
+      call xolox#timer#stop(msg, pathname, tags_to_links_start)
     endif
     call publish#customize_html(pathname)
     silent execute 'write!' fnameescape(target_path)
