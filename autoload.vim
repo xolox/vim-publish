@@ -230,12 +230,17 @@ function! publish#prep_env(enable) " {{{1
   " anchors which are used as the targets of hyperlinks created from tags.
   " Also instruct the 2html script to use CSS which we will modify to improve
   " the appearance of hyperlinks (so they inherit the highlighting color).
+  " Finally ignore any text folding until I find out how to get the dynamic
+  " JavaScript text folding to work.
   if a:enable
+    let s:hif_save = exists('g:html_ignore_folding') ? g:html_ignore_folding : 0
     let s:hnl_save = exists('g:html_number_lines') ? g:html_number_lines : 0
     let s:huc_save = exists('g:html_use_css') ? g:html_use_css : 0
+    let g:html_ignore_folding = 1
     let g:html_number_lines =  1
     let g:html_use_css = 1
   else
+    let g:html_ignore_folding = s:hif_save
     let g:html_number_lines =  s:hnl_save
     let g:html_use_css =  s:huc_save
   endif
