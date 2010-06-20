@@ -245,7 +245,7 @@ endfunction
 function! publish#customize_html(page_title) " {{{1
 
   " Change document title to relative pathname.
-  silent keepjumps %s@<title>\zs.*\ze</title>@\=a:page_title@
+  silent keepjumps %s@<title>\zs.*\ze</title>@\=publish#html_encode(a:page_title)@e
 
   " Insert CSS to remove the default colors and underline from hyper links
   " and to remove any padding between the browser chrome and page content.
@@ -254,11 +254,18 @@ function! publish#customize_html(page_title) " {{{1
   let custom_css .= "\npre:hover a:link, pre:hover a:visited { text-decoration: underline; }"
   let custom_css .= "\na:link span, a:visited span { text-decoration: inherit; }"
   let custom_css .= "\n.lnr a:link, .lnr a:visited { text-decoration: none !important; }"
-  silent keepjumps %s@\ze\_s\+-->\_s\+</style>@\= "\n" . custom_css@
+  silent keepjumps %s@\ze\_s\+-->\_s\+</style>@\= "\n" . custom_css@e
 
   " Add link anchors to line numbering.
-  silent keepjumps %s@<span class="lnr">\zs\s*\(\d\+\)\s*\ze</span>@<a name="l\1" href="#l\1">\0</a>@g
+  silent keepjumps %s@<span class="lnr">\zs\s*\(\d\+\)\s*\ze</span>@<a name="l\1" href="#l\1">\0</a>@eg
 
+endfunction
+
+function! publish#html_encode(s) " {{{1
+  let s = substitute(a:s, '&', '&amp;', 'g')
+  let s = substitute(s, '<', '&lt;', 'g')
+  let s = substitute(s, '>', '&gt;', 'g')
+  return s
 endfunction
 
 " vim: ts=2 sw=2 et

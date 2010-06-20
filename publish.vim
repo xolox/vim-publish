@@ -105,7 +105,8 @@ function! s:ConvertTagToLink(name) " {{{1
     " TODO This is likely to be slow so cache the results?!
     let relative = xolox#path#relative(pathname, s:current_source_directory)
     let suffix = g:publish_omit_dothtml ? '' : '.html'
-    return '<a href="' . relative . suffix . '#l' . entry.lnum . '">' . a:name . '</a>'
+    let href = publish#html_encode(relative . suffix . '#l' . entry.lnum)
+    return '<a href="' . href . '">' . a:name . '</a>'
   catch
     return a:name
   endtry
