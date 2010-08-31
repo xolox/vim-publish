@@ -72,8 +72,10 @@ function! s:pattern_to_lnum(entry, pathname) " {{{2
     else
       let contents = s:cached_contents[a:pathname]
     endif
-    let pattern = substitute(a:entry.cmd, '^/\(.*\)/$', '\1', '')
-    let pattern = substitute(pattern, '\~', '\\~', 'g')
+    " Convert tag search command to plain Vim pattern, based on :help tag-search.
+    let pattern = a:entry.cmd
+    let pattern = matchstr(pattern, '^/^\zs.*\ze$/$')
+    let pattern = '^' . xolox#escape#pattern(pattern) . '$'
     try
       let index = match(contents, pattern)
     catch
