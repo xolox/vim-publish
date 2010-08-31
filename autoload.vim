@@ -105,7 +105,7 @@ function! publish#create_subst_cmd(tags_to_publish) " {{{1
     endfor
     let entry = a:tags_to_publish[name]
     if g:publish_viml_sl_hack && get(entry, 'language') == 'Vim'
-      let subpattern = '\s\(s:\|<[Ss][Ii][Dd]>\)' . name . '\s*('
+      let subpattern = '\s\(s:\|<[Ss][Ii][Dd]>\)' . xolox#escape#pattern(name) . '\s*('
       if get(entry, 'cmd') =~ subpattern
         if !exists('s:viml_sl_prefix')
           let s:viml_sl_prefix = s:nasty()
