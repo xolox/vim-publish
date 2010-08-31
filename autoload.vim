@@ -1,7 +1,7 @@
 " Vim script
-" Maintainer: Peter Odding <peter@peterodding.com>
-" Last Change: June 20, 2010
-" URL: http://peterodding.com/code/vim/publish
+" Author: Peter Odding <peter@peterodding.com>
+" Last Change: August 31, 2010
+" URL: http://peterodding.com/code/vim/publish/
 
 function! publish#resolve_files(directory, pathnames) " {{{1
   " Create a dictionary that maps the fully resolved pathnames of the files to
@@ -70,7 +70,7 @@ function! s:pattern_to_lnum(entry, pathname) " {{{2
       let contents = readfile(a:pathname)
       let s:cached_contents[a:pathname] = contents
     else
-     let contents = s:cached_contents[a:pathname]
+      let contents = s:cached_contents[a:pathname]
     endif
     let pattern = substitute(a:entry.cmd, '^/\(.*\)/$', '\1', '')
     let pattern = substitute(pattern, '\~', '\\~', 'g')

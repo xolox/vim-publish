@@ -1,7 +1,7 @@
 " Vim plug-in
-" Maintainer: Peter Odding <peter@peterodding.com>
-" Last Change: June 20, 2010
-" URL: http://peterodding.com/code/vim/publish
+" Author: Peter Odding <peter@peterodding.com>
+" Last Change: August 31, 2010
+" URL: http://peterodding.com/code/vim/publish/
 " License: MIT
 " Version: 1.6
 
