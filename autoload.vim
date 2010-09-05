@@ -1,6 +1,6 @@
 " Vim script
 " Author: Peter Odding <peter@peterodding.com>
-" Last Change: August 31, 2010
+" Last Change: September 5, 2010
 " URL: http://peterodding.com/code/vim/publish/
 
 function! publish#resolve_files(directory, pathnames) " {{{1
@@ -269,9 +269,9 @@ function! publish#customize_html(page_title) " {{{1
 endfunction
 
 function! publish#html_encode(s) " {{{1
-  let s = substitute(a:s, '&', '&amp;', 'g')
-  let s = substitute(s, '<', '&lt;', 'g')
-  let s = substitute(s, '>', '&gt;', 'g')
+  let s = substitute(a:s, '&', '\&amp;', 'g')
+  let s = substitute(s, '<', '\&lt;', 'g')
+  let s = substitute(s, '>', '\&gt;', 'g')
   return s
 endfunction
 
