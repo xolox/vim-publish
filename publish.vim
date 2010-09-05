@@ -3,7 +3,7 @@
 " Last Change: September 5, 2010
 " URL: http://peterodding.com/code/vim/publish/
 " License: MIT
-" Version: 1.6
+" Version: 1.7
 
 " Support for automatic update using the GLVS plug-in.
 " GetLatestVimScripts: 2252 1 :AutoInstall: publish.zip
@@ -25,6 +25,7 @@ function! Publish(source, target, files) abort
   let start = xolox#timer#start()
   call xolox#message("Preparing to publish file%s ..", len(a:files) == 1 ? '' : 's')
   let s:files_to_publish = publish#resolve_files(a:source, a:files)
+  call publish#update_tags(values(s:files_to_publish))
   let s:tags_to_publish = publish#find_tags(s:files_to_publish)
   if s:tags_to_publish != {}
     let tags_to_links_command = publish#create_subst_cmd(s:tags_to_publish)
@@ -52,7 +53,10 @@ function! Publish(source, target, files) abort
       let plaintext_path = xolox#path#merge(target_dir, pathname . '.txt')
       silent execute 'write!' fnameescape(plaintext_path)
     endif
-    silent execute 'doautocmd User PublishPre'
+    " Highlight tags in current buffer using easytags.vim?
+    if exists('g:loaded_easytags')
+      HighlightTags
+    endif
     let highlight_start = xolox#timer#start()
     call publish#munge_syntax_items()
     runtime syntax/2html.vim

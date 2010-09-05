@@ -16,6 +16,15 @@ function! publish#resolve_files(directory, pathnames) " {{{1
   return resolved_files
 endfunction
 
+function! publish#update_tags(pathnames) " {{{1
+  " Integration with easytags.vim to automatically create/update tags for all
+  " files before they're published, see http://peterodding.com/code/vim/easytags/
+  if exists('g:loaded_easytags')
+    call map(a:pathnames, 'fnameescape(v:val)')
+    execute 'UpdateTags' join(a:pathnames)
+  endif
+endfunction
+
 function! publish#find_tags(files_to_publish) " {{{1
   " Given a dictionary like the one created above, this function will filter
   " the results of taglist() to remove irrelevant entries. In the process tag
