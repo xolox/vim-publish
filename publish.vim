@@ -1,9 +1,9 @@
 " Vim plug-in
 " Author: Peter Odding <peter@peterodding.com>
-" Last Change: September 5, 2010
+" Last Change: September 6, 2010
 " URL: http://peterodding.com/code/vim/publish/
 " License: MIT
-" Version: 1.7
+" Version: 1.7.1
 
 " Support for automatic update using the GLVS plug-in.
 " GetLatestVimScripts: 2252 1 :AutoInstall: publish.zip

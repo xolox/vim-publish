@@ -1,6 +1,6 @@
 " Vim script
 " Author: Peter Odding <peter@peterodding.com>
-" Last Change: September 5, 2010
+" Last Change: September 6, 2010
 " URL: http://peterodding.com/code/vim/publish/
 
 function! publish#resolve_files(directory, pathnames) " {{{1
@@ -20,8 +20,7 @@ function! publish#update_tags(pathnames) " {{{1
   " Integration with easytags.vim to automatically create/update tags for all
   " files before they're published, see http://peterodding.com/code/vim/easytags/
   if exists('g:loaded_easytags')
-    call map(a:pathnames, 'fnameescape(v:val)')
-    execute 'UpdateTags' join(a:pathnames)
+    call easytags#update(1, 0, a:pathnames)
   endif
 endfunction
 
