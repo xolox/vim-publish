@@ -92,43 +92,36 @@ function! publish#create_subst_cmd(tags_to_publish) " {{{1
   " Generate a :substitute command that, when executed, replaces tags with
   " hyperlinks using a callback. This is complicated somewhat by the fact that
   " tag names won't always appear literally in the output of 2html.vim, for
-  " example the names of Vim autoload functions appear as:
+  " example the names of Vim autoload functions can appear as:
   " 
   "   foo#bar#<span class=Normal>baz</span>
   " 
   let patterns = []
+  let slfunctions = []
   for name in keys(a:tags_to_publish)
-    let tokens = []
-    for token in split(name, '\W\@=\|\W\@<=')
-      let escaped = xolox#escape#pattern(token)
-      call add(tokens, s:ignore_html(token))
-    endfor
     let entry = a:tags_to_publish[name]
-    if g:publish_viml_sl_hack && get(entry, 'language') == 'Vim'
-      let subpattern = '\s\(s:\|<[Ss][Ii][Dd]>\)' . xolox#escape#pattern(name) . '\s*('
-      if get(entry, 'cmd') =~ subpattern
-        if !exists('s:viml_sl_prefix')
-          let s:viml_sl_prefix = s:nasty()
-        endif
-        call insert(tokens, s:viml_sl_prefix)
+    if get(entry, 'language') == 'Vim'
+      let is_slfunc = '\s\(s:\|<[Ss][Ii][Dd]>\)' . xolox#escape#pattern(name) . '\s*('
+      if get(entry, 'cmd') =~ is_slfunc
+        call add(slfunctions, xolox#escape#pattern(name))
+        continue
       endif
     endif
-    call add(patterns, join(tokens, ''))
+    call add(patterns, xolox#escape#pattern(name))
   endfor
+  call insert(patterns, '\%(\%(&lt;[Ss][Ii][Dd]&gt;\|s:\)\%(' . join(slfunctions, '\|') . '\)\)')
   let tag_names_pattern = escape(join(patterns, '\|'), '/')
   " Gotcha: Use \w\@<! and \w\@! here instead of \< and \> which won't work.
   return '%s/[A-Za-z0-9_]\@<!\%(' . tag_names_pattern . '\)[A-Za-z0-9_]\@!/\=s:ConvertTagToLink(submatch(0))/eg'
 endfunction
 
-function! s:ignore_html(s)
-  return printf('\%%(<[^/][^>]*>%s</[^>]\+>\|%s\)', a:s, a:s)
-endfunction
-
-function! s:nasty()
-  " return '\%(s:\|&lt;[Ss][Ii][Dd]&gt;\)'
-  let short = s:ignore_html('s') . s:ignore_html(':')
-  let long = s:ignore_html('&lt;') . s:ignore_html('[Ss][Ii][Dd]') . s:ignore_html('&gt;')
-  return '\%(' . short . '\|' . long . '\)'
+function! publish#munge_syntax_items() " {{{1
+  " Tag to hyperlink conversion only works when tag names appear literally in
+  " the output of 2html.vim while this isn't always the case in Vim scripts.
+  if &filetype == 'vim'
+    syntax match vimFuncName /\<s:\w\+\>/ containedin=vim.*
+    syntax match vimFuncName /\c<Sid>\w\+\>/ containedin=vim.*
+  endif
 endfunction
 
 function! publish#rsync_check(target) " {{{1

@@ -1,6 +1,6 @@
 " Vim plug-in
 " Author: Peter Odding <peter@peterodding.com>
-" Last Change: August 31, 2010
+" Last Change: September 5, 2010
 " URL: http://peterodding.com/code/vim/publish/
 " License: MIT
 " Version: 1.6
@@ -19,10 +19,6 @@ endif
 
 if !exists('g:publish_plaintext')
   let g:publish_plaintext = 0
-endif
-
-if !exists('g:publish_viml_sl_hack')
-  let g:publish_viml_sl_hack = 1
 endif
 
 function! Publish(source, target, files) abort
@@ -58,6 +54,7 @@ function! Publish(source, target, files) abort
     endif
     silent execute 'doautocmd User PublishPre'
     let highlight_start = xolox#timer#start()
+    call publish#munge_syntax_items()
     runtime syntax/2html.vim
     let msg = "publish.vim: The 2html.vim script took %s to highlight %s."
     call xolox#timer#stop(msg, highlight_start, pathname)
