@@ -6,7 +6,7 @@ After several attempts I managed a working prototype, but it was quite rough aro
 
 ## Installation & usage
 
-Unzip the most recent [ZIP archive](http://peterodding.com/code/vim/downloads/publish) file inside your Vim profile directory (usually this is `~/.vim` on UNIX and `%USERPROFILE%\vimfiles` on Windows), restart Vim and execute the command `:helptags ~/.vim/doc` (use `:helptags ~\vimfiles\doc` instead on Windows). As an example we'll publish the plug-in using itself. First create a tags file that contains entries for the files you want to publish using a shell command such as:
+Unzip the most recent [ZIP archive](http://peterodding.com/code/vim/downloads/publish.zip) file inside your Vim profile directory (usually this is `~/.vim` on UNIX and `%USERPROFILE%\vimfiles` on Windows), restart Vim and execute the command `:helptags ~/.vim/doc` (use `:helptags ~\vimfiles\doc` instead on Windows). As an example we'll publish the plug-in using itself. First create a tags file that contains entries for the files you want to publish using a shell command such as:
 
     $ ctags -Rf ~/.publish_tags ~/.vim/
 
@@ -26,7 +26,7 @@ The plug-in needs an up-to-date tags file so that it can create hyperlinks betwe
         \ 'plugin/publish.vim',
         \ ])
 
-Change the `sources` and `target` variables to reflect your situation, save the script as `~/publish_test.vim` and execute it in Vim by typing `:source ~/publish_test.vim` and pressing `Enter↵`. If everything goes well Vim will be busy for a moment and after that you will find a bunch of syntax highlighted, interlinked HTML documents in the `target` directory!
+Change the `sources` and `target` variables to reflect your situation, save the script as `~/publish_test.vim` and try it in Vim by executing the command `:source ~/publish_test.vim`. If everything goes well Vim will be busy for a moment and after that you will find a bunch of syntax highlighted, interlinked HTML documents in the `target` directory!
 
 ## Publishing to a remote location (website)
 

@@ -1,22 +1,22 @@
 " Vim script
 " Author: Peter Odding <peter@peterodding.com>
-" Last Change: September 6, 2010
+" Last Change: May 26, 2011
 " URL: http://peterodding.com/code/vim/publish/
 
-function! publish#resolve_files(directory, pathnames) " {{{1
+function! xolox#publish#resolve_files(directory, pathnames) " {{{1
   " Create a dictionary that maps the fully resolved pathnames of the files to
   " be published to the absolute pathnames provided by the user. This enables
   " the script to gracefully handle symbolic links which I use a lot :-)
   let resolved_files = {}
   for pathname in a:pathnames
-    let pathname = xolox#path#merge(a:directory, pathname)
+    let pathname = xolox#misc#path#merge(a:directory, pathname)
     let absolute = fnamemodify(pathname, ':p')
     let resolved_files[resolve(absolute)] = absolute
   endfor
   return resolved_files
 endfunction
 
-function! publish#update_tags(pathnames) " {{{1
+function! xolox#publish#update_tags(pathnames) " {{{1
   " Integration with easytags.vim to automatically create/update tags for all
   " files before they're published, see http://peterodding.com/code/vim/easytags/
   if exists('g:loaded_easytags')
@@ -24,16 +24,16 @@ function! publish#update_tags(pathnames) " {{{1
   endif
 endfunction
 
-function! publish#find_tags(files_to_publish) " {{{1
+function! xolox#publish#find_tags(files_to_publish) " {{{1
   " Given a dictionary like the one created above, this function will filter
   " the results of taglist() to remove irrelevant entries. In the process tag
   " search ex-commands are converted into line numbers.
-  let start = xolox#timer#start()
+  let start = xolox#misc#timer#start()
   let num_duplicates = 0
   let tags_to_publish = {}
   let s:cached_contents = {}
   for entry in taglist('.')
-    let pathname = xolox#path#absolute(entry.filename)
+    let pathname = xolox#misc#path#absolute(entry.filename)
     if has_key(a:files_to_publish, pathname) && s:pattern_to_lnum(entry, pathname)
       if !has_key(tags_to_publish, entry.name)
         let tags_to_publish[entry.name] = entry
@@ -48,7 +48,7 @@ function! publish#find_tags(files_to_publish) " {{{1
           let this_path = string(entry.filename)
           let other_path = string(other.filename)
           let msg = "publish.vim: Ignoring duplicate tag %s! (duplicate is in %s, first was in %s)"
-          call xolox#warning(msg, tag_name, this_path, other_path)
+          call xolox#misc#msg#warn(msg, tag_name, this_path, other_path)
         endif
       endif
     endif
@@ -56,12 +56,12 @@ function! publish#find_tags(files_to_publish) " {{{1
   if num_duplicates > 3
     let more = num_duplicates - 3
     let msg = "publish.vim: Ignored %s more duplicate tag%s!"
-    call xolox#warning(msg, more, more == 1 ? '' : 's')
+    call xolox#misc#msg#warn(msg, more, more == 1 ? '' : 's')
   endif
   unlet s:cached_contents
   let msg = "publish.vim: Found %i tag%s to publish in %s."
   let numtags = len(tags_to_publish)
-  call xolox#timer#stop(msg, numtags, numtags != 1 ? 's' : '', start)
+  call xolox#misc#timer#stop(msg, numtags, numtags != 1 ? 's' : '', start)
   return tags_to_publish
 endfunction
 
@@ -83,7 +83,7 @@ function! s:pattern_to_lnum(entry, pathname) " {{{2
     " Convert tag search command to plain Vim pattern, based on :help tag-search.
     let pattern = a:entry.cmd
     let pattern = matchstr(pattern, '^/^\zs.*\ze$/$')
-    let pattern = '^' . xolox#escape#pattern(pattern) . '$'
+    let pattern = '^' . xolox#misc#escape#pattern(pattern) . '$'
     try
       let index = match(contents, pattern)
     catch
@@ -96,7 +96,7 @@ function! s:pattern_to_lnum(entry, pathname) " {{{2
   endif
 endfunction
 
-function! publish#create_subst_cmd(tags_to_publish) " {{{1
+function! xolox#publish#create_subst_cmd(tags_to_publish) " {{{1
   " Generate a :substitute command that, when executed, replaces tags with
   " hyperlinks using a callback. This is complicated somewhat by the fact that
   " tag names won't always appear literally in the output of 2html.vim, for
@@ -109,13 +109,13 @@ function! publish#create_subst_cmd(tags_to_publish) " {{{1
   for name in keys(a:tags_to_publish)
     let entry = a:tags_to_publish[name]
     if get(entry, 'language') == 'Vim'
-      let is_slfunc = '\s\(s:\|<[Ss][Ii][Dd]>\)' . xolox#escape#pattern(name) . '\s*('
+      let is_slfunc = '\s\(s:\|<[Ss][Ii][Dd]>\)' . xolox#misc#escape#pattern(name) . '\s*('
       if get(entry, 'cmd') =~ is_slfunc
-        call add(slfunctions, xolox#escape#pattern(name))
+        call add(slfunctions, xolox#misc#escape#pattern(name))
         continue
       endif
     endif
-    call add(patterns, xolox#escape#pattern(name))
+    call add(patterns, xolox#misc#escape#pattern(name))
   endfor
   call insert(patterns, '\%(\%(&lt;[Ss][Ii][Dd]&gt;\|s:\)\%(' . join(slfunctions, '\|') . '\)\)')
   let tag_names_pattern = escape(join(patterns, '\|'), '/')
@@ -123,7 +123,7 @@ function! publish#create_subst_cmd(tags_to_publish) " {{{1
   return '%s/[A-Za-z0-9_]\@<!\%(' . tag_names_pattern . '\)[A-Za-z0-9_]\@!/\=s:ConvertTagToLink(submatch(0))/eg'
 endfunction
 
-function! publish#munge_syntax_items() " {{{1
+function! xolox#publish#munge_syntax_items() " {{{1
   " Tag to hyperlink conversion only works when tag names appear literally in
   " the output of 2html.vim while this isn't always the case in Vim scripts.
   if &filetype == 'vim'
@@ -132,8 +132,8 @@ function! publish#munge_syntax_items() " {{{1
   endif
 endfunction
 
-function! publish#rsync_check(target) " {{{1
-  let start = xolox#timer#start()
+function! xolox#publish#rsync_check(target) " {{{1
+  let start = xolox#misc#timer#start()
   let result = ''
   let matches = matchlist(a:target, '^sftp://\([^/]\+\)\(.*\)$')
   if len(matches) >= 3
@@ -147,23 +147,23 @@ function! publish#rsync_check(target) " {{{1
       endif
     endif
   endif
-  call xolox#timer#stop("publish.vim: Checked rsync support in %s.", start)
+  call xolox#misc#timer#stop("publish.vim: Checked rsync support in %s.", start)
   return result
 endfunction
 
-function! publish#run_rsync(target, tempdir) " {{{1
-  let start = xolox#timer#start()
+function! xolox#publish#run_rsync(target, tempdir) " {{{1
+  let start = xolox#misc#timer#start()
   let target = fnameescape(a:target . '/')
   let tempdir = fnameescape(a:tempdir . '/')
-  call xolox#message("publish.vim: Uploading files to %s using rsync.", a:target)
+  call xolox#misc#msg#info("publish.vim: Uploading files to %s using rsync.", a:target)
   execute '!rsync -vr' tempdir target
-  call xolox#timer#stop("publish.vim: Finished uploading in %s.", start)
+  call xolox#misc#timer#stop("publish.vim: Finished uploading in %s.", start)
   if v:shell_error
     throw "publish.vim: Failed to run rsync!"
   endif
 endfunction
 
-function! publish#create_dirs(target_path) " {{{1
+function! xolox#publish#create_dirs(target_path) " {{{1
   " If the directory where the files are published resides on the local file
   " system then try to automatically create any missing directories because
   " creating those directories by hand quickly gets tiresome.
@@ -175,11 +175,11 @@ function! publish#create_dirs(target_path) " {{{1
         let msg = "Failed to create directory %s! What now?"
         if confirm(printf(msg, string(current_directory)), "&Abort\n&Ignore") == 1
           let msg = "publish.vim: Failed to create %s, aborting .."
-          call xolox#warning(msg, string(current_directory))
+          call xolox#misc#msg#warn(msg, string(current_directory))
           return 0
         else
           let msg = "publish.vim: Failed to create %s, ignoring .."
-          call xolox#warning(msg, string(current_directory))
+          call xolox#misc#msg#warn(msg, string(current_directory))
           continue
         endif
       endif
@@ -188,7 +188,7 @@ function! publish#create_dirs(target_path) " {{{1
   return 1
 endfunction
 
-function! publish#prep_env(enable) " {{{1
+function! xolox#publish#prep_env(enable) " {{{1
 
   " Change the environment before publishing and restore afterwards.
 
@@ -250,10 +250,10 @@ function! publish#prep_env(enable) " {{{1
 
 endfunction
 
-function! publish#customize_html(page_title) " {{{1
+function! xolox#publish#customize_html(page_title) " {{{1
 
   " Change document title to relative pathname.
-  silent keepjumps %s@<title>\zs.*\ze</title>@\=publish#html_encode(a:page_title)@e
+  silent keepjumps %s@<title>\zs.*\ze</title>@\=xolox#publish#html_encode(a:page_title)@e
 
   " Insert CSS to remove the default colors and underline from hyper links
   " and to remove any padding between the browser chrome and page content.
@@ -269,7 +269,7 @@ function! publish#customize_html(page_title) " {{{1
 
 endfunction
 
-function! publish#html_encode(s) " {{{1
+function! xolox#publish#html_encode(s) " {{{1
   let s = substitute(a:s, '&', '\&amp;', 'g')
   let s = substitute(s, '<', '\&lt;', 'g')
   let s = substitute(s, '>', '\&gt;', 'g')
