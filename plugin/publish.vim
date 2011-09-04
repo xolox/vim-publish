@@ -1,14 +1,12 @@
 " Vim plug-in
 " Author: Peter Odding <peter@peterodding.com>
-" Last Change: May 26, 2011
+" Last Change: September 4, 2011
 " URL: http://peterodding.com/code/vim/publish/
-" License: MIT
-" Version: 1.7.2
 
 " Support for automatic update using the GLVS plug-in.
 " GetLatestVimScripts: 2252 1 :AutoInstall: publish.zip
 
-" Don't source the plug-in when its already been loaded or &compatible is set.
+" Don't source the plug-in when it's already been loaded or &compatible is set.
 if &cp || exists('g:loaded_publish')
   finish
 endif
@@ -23,7 +21,7 @@ endif
 
 function! Publish(source, target, files) abort
   let start = xolox#misc#timer#start()
-  call xolox#misc#msg#info("Preparing to publish file%s ..", len(a:files) == 1 ? '' : 's')
+  call xolox#misc#msg#info("publish.vim %s: Preparing to publish file%s ..", g:xolox#publish#version, len(a:files) == 1 ? '' : 's')
   let s:files_to_publish = xolox#publish#resolve_files(a:source, a:files)
   call xolox#publish#update_tags(values(s:files_to_publish))
   let s:tags_to_publish = xolox#publish#find_tags(s:files_to_publish)
@@ -40,7 +38,7 @@ function! Publish(source, target, files) abort
     let source_path = xolox#misc#path#merge(a:source, pathname)
     let suffix = g:publish_omit_dothtml ? '' : '.html'
     let target_path = xolox#misc#path#merge(target_dir, pathname . suffix)
-    call xolox#misc#msg#info("Publishing %s", string(pathname))
+    call xolox#misc#msg#info("publish.vim %s: Publishing %s", g:xolox#publish#version, string(pathname))
     if !xolox#publish#create_dirs(target_path)
       return
     endif
@@ -60,13 +58,13 @@ function! Publish(source, target, files) abort
     let highlight_start = xolox#misc#timer#start()
     call xolox#publish#munge_syntax_items()
     runtime syntax/2html.vim
-    let msg = "publish.vim: The 2html.vim script took %s to highlight %s."
-    call xolox#misc#timer#stop(msg, highlight_start, pathname)
+    let msg = "publish.vim %s: The 2html.vim script took %s to highlight %s."
+    call xolox#misc#timer#stop(msg, g:xolox#publish#version, highlight_start, pathname)
     if exists('tags_to_links_command')
       let tags_to_links_start = xolox#misc#timer#start()
       silent execute tags_to_links_command
-      let msg = "publish.vim: Finished converting tags in %s to links in %s."
-      call xolox#misc#timer#stop(msg, pathname, tags_to_links_start)
+      let msg = "publish.vim %s: Finished converting tags in %s to links in %s."
+      call xolox#misc#timer#stop(msg, g:xolox#publish#version, pathname, tags_to_links_start)
     endif
     call xolox#publish#customize_html(pathname)
     silent execute 'write!' fnameescape(target_path)
@@ -76,9 +74,9 @@ function! Publish(source, target, files) abort
   if rsync_target != ''
     call xolox#publish#run_rsync(rsync_target, rsync_dir)
   endif
-  let msg = "publish.vim: Published %i file%s to %s."
-  call xolox#misc#msg#info(msg, len(a:files), len(a:files) == 1 ? '' : 's', a:target)
-  call xolox#misc#timer#stop("Finished publishing files in %s.", start)
+  let msg = "publish.vim %s: Published %i file%s to %s."
+  call xolox#misc#msg#info(msg, g:xolox#publish#version, len(a:files), len(a:files) == 1 ? '' : 's', a:target)
+  call xolox#misc#timer#stop("publish.vim %s: Finished publishing files in %s.", g:xolox#publish#version, start)
   call xolox#publish#prep_env(0)
 endfunction
 

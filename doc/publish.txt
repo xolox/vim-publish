@@ -14,7 +14,7 @@ in Vim scripting so I decided to clean up my code and release it. If you're
 wondering what the result looks like, I've published the plug-in source code
 [2] as a demonstration.
 
-==============================================================================
+===============================================================================
                                                     *publish-installation-usage*
 Installation & usage ~
 
@@ -53,7 +53,7 @@ the script as '~/publish_test.vim' and try it in Vim by executing the command
 moment and after that you will find a bunch of syntax highlighted, interlinked
 HTML documents in the 'target' directory!
 
-==============================================================================
+===============================================================================
 Publishing to a remote location (website) ~
 
 As you can see from the example above it's possible to publish files directly
@@ -73,7 +73,7 @@ automatically use rsync [6] when both the local and remote system have it
 installed. This cuts the time to publish to a remote location in half and
 enables the plug-in to automatically create directories on the remote side.
 
-==============================================================================
+===============================================================================
                                                                *publish-contact*
 Contact ~
 
@@ -82,14 +82,14 @@ contacted at peter@peterodding.com. The latest version is available at
 http://peterodding.com/code/vim/publish/ and http://github.com/xolox/vim-publish.
 If you like the script please vote for it on Vim Online [7].
 
-==============================================================================
+===============================================================================
                                                                *publish-license*
 License ~
 
-This software is licensed under the MIT license [8]. Copyright 2010 Peter
+This software is licensed under the MIT license [8]. Copyright 2011 Peter
 Odding <peter@peterodding.com>.
 
-==============================================================================
+===============================================================================
                                                             *publish-references*
 References ~
 

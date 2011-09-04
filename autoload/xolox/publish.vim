@@ -1,7 +1,9 @@
 " Vim script
 " Author: Peter Odding <peter@peterodding.com>
-" Last Change: May 26, 2011
+" Last Change: September 4, 2011
 " URL: http://peterodding.com/code/vim/publish/
+
+let g:xolox#publish#version = '1.7.3'
 
 function! xolox#publish#resolve_files(directory, pathnames) " {{{1
   " Create a dictionary that maps the fully resolved pathnames of the files to
@@ -47,21 +49,21 @@ function! xolox#publish#find_tags(files_to_publish) " {{{1
           let tag_name = string(entry.name)
           let this_path = string(entry.filename)
           let other_path = string(other.filename)
-          let msg = "publish.vim: Ignoring duplicate tag %s! (duplicate is in %s, first was in %s)"
-          call xolox#misc#msg#warn(msg, tag_name, this_path, other_path)
+          let msg = "publish.vim %s: Ignoring duplicate tag %s! (duplicate is in %s, first was in %s)"
+          call xolox#misc#msg#warn(msg, g:xolox#publish#version, tag_name, this_path, other_path)
         endif
       endif
     endif
   endfor
   if num_duplicates > 3
     let more = num_duplicates - 3
-    let msg = "publish.vim: Ignored %s more duplicate tag%s!"
-    call xolox#misc#msg#warn(msg, more, more == 1 ? '' : 's')
+    let msg = "publish.vim: %s Ignored %s more duplicate tag%s!"
+    call xolox#misc#msg#warn(msg, g:xolox#publish#version, more, more == 1 ? '' : 's')
   endif
   unlet s:cached_contents
-  let msg = "publish.vim: Found %i tag%s to publish in %s."
+  let msg = "publish.vim %s: Found %i tag%s to publish in %s."
   let numtags = len(tags_to_publish)
-  call xolox#misc#timer#stop(msg, numtags, numtags != 1 ? 's' : '', start)
+  call xolox#misc#timer#stop(msg, g:xolox#publish#version, numtags, numtags != 1 ? 's' : '', start)
   return tags_to_publish
 endfunction
 
@@ -147,7 +149,7 @@ function! xolox#publish#rsync_check(target) " {{{1
       endif
     endif
   endif
-  call xolox#misc#timer#stop("publish.vim: Checked rsync support in %s.", start)
+  call xolox#misc#timer#stop("publish.vim %s: Checked rsync support in %s.", g:xolox#publish#version, start)
   return result
 endfunction
 
@@ -155,9 +157,9 @@ function! xolox#publish#run_rsync(target, tempdir) " {{{1
   let start = xolox#misc#timer#start()
   let target = fnameescape(a:target . '/')
   let tempdir = fnameescape(a:tempdir . '/')
-  call xolox#misc#msg#info("publish.vim: Uploading files to %s using rsync.", a:target)
+  call xolox#misc#msg#info("publish.vim %s: Uploading files to %s using rsync.", g:xolox#publish#version, a:target)
   execute '!rsync -vr' tempdir target
-  call xolox#misc#timer#stop("publish.vim: Finished uploading in %s.", start)
+  call xolox#misc#timer#stop("publish.vim %s: Finished uploading in %s.", g:xolox#publish#version, start)
   if v:shell_error
     throw "publish.vim: Failed to run rsync!"
   endif
@@ -174,12 +176,12 @@ function! xolox#publish#create_dirs(target_path) " {{{1
       if !isdirectory(current_directory)
         let msg = "Failed to create directory %s! What now?"
         if confirm(printf(msg, string(current_directory)), "&Abort\n&Ignore") == 1
-          let msg = "publish.vim: Failed to create %s, aborting .."
-          call xolox#misc#msg#warn(msg, string(current_directory))
+          let msg = "publish.vim %s: Failed to create %s, aborting .."
+          call xolox#misc#msg#warn(msg, g:xolox#publish#version, string(current_directory))
           return 0
         else
-          let msg = "publish.vim: Failed to create %s, ignoring .."
-          call xolox#misc#msg#warn(msg, string(current_directory))
+          let msg = "publish.vim %s: Failed to create %s, ignoring .."
+          call xolox#misc#msg#warn(msg, g:xolox#publish#version, string(current_directory))
           continue
         endif
       endif
