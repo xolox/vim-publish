@@ -1,9 +1,11 @@
 " Vim script
 " Author: Peter Odding <peter@peterodding.com>
-" Last Change: November 26, 2011
+" Last Change: April 21, 2013
 " URL: http://peterodding.com/code/vim/publish/
 
-let g:xolox#publish#version = '1.7.7'
+let g:xolox#publish#version = '1.7.8'
+
+call xolox#misc#compat#check('publish', 1)
 
 function! xolox#publish#resolve_files(directory, pathnames) " {{{1
   " Create a dictionary that maps the fully resolved pathnames of the files to

@@ -1,5 +1,19 @@
 *publish.txt*  Publish hyperlinked, syntax highlighted source code with Vim
 
+===============================================================================
+                                                              *publish-contents*
+Contents ~
+
+ 1. Introduction                                          |publish-introduction|
+ 2. Installation & usage                            |publish-installation-usage|
+ 3. Publishing to a remote location (website)
+ 4. Contact                                                    |publish-contact|
+ 5. License                                                    |publish-license|
+
+===============================================================================
+                                                          *publish-introduction*
+Introduction ~
+
 The Vim text editor includes the script |2html.vim| which can be used to convert
 a syntax highlighted buffer in Vim to an HTML document that, when viewed in a
 web browser, should look exactly the same. After using that script for a while
@@ -86,7 +100,7 @@ If you like the script please vote for it on Vim Online [7].
                                                                *publish-license*
 License ~
 
-This software is licensed under the MIT license [8]. Copyright 2011 Peter
+This software is licensed under the MIT license [8]. Copyright 2013 Peter
 Odding <peter@peterodding.com>.
 
 ===============================================================================
