@@ -1,9 +1,9 @@
 " Vim script
 " Author: Peter Odding <peter@peterodding.com>
-" Last Change: April 21, 2013
+" Last Change: April 28, 2013
 " URL: http://peterodding.com/code/vim/publish/
 
-let g:xolox#publish#version = '1.7.8'
+let g:xolox#publish#version = '1.7.9'
 
 call xolox#misc#compat#check('publish', 1)
 
