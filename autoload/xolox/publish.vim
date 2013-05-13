@@ -1,11 +1,11 @@
 " Vim script
 " Author: Peter Odding <peter@peterodding.com>
-" Last Change: April 30, 2013
+" Last Change: May 13, 2013
 " URL: http://peterodding.com/code/vim/publish/
 
-let g:xolox#publish#version = '1.7.10'
+let g:xolox#publish#version = '1.7.11'
 
-call xolox#misc#compat#check('publish', 2)
+call xolox#misc#compat#check('publish', 3)
 
 function! xolox#publish#resolve_files(directory, pathnames) " {{{1
   " Create a dictionary that maps the fully resolved pathnames of the files to
@@ -143,10 +143,10 @@ function! xolox#publish#rsync_check(target) " {{{1
   if len(matches) >= 3
     let host = matches[1]
     let path = substitute(matches[2], '^/', '', '')
-    call system('rsync --version')
-    if !v:shell_error
-      call system('ssh ' . host . ' rsync --version')
-      if !v:shell_error
+    let result = xolox#misc#os#exec({'command': 'rsync --version', 'check': 0})
+    if result['exit_code'] == 0
+      let result = xolox#misc#os#exec({'command': 'ssh ' . host . ' rsync --version', 'check': 0})
+      if result['exit_code'] == 0
         let result = host . ':' . path
       endif
     endif
