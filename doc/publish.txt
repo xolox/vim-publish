@@ -100,8 +100,8 @@ If you like the script please vote for it on Vim Online [7].
                                                                *publish-license*
 License ~
 
-This software is licensed under the MIT license [8]. Copyright 2013 Peter
-Odding <peter@peterodding.com>.
+This software is licensed under the MIT license [8]. ÂŠ 2013 Peter Odding
+<peter@peterodding.com>.
 
 ===============================================================================
                                                             *publish-references*
