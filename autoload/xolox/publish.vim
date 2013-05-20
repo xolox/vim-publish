@@ -3,9 +3,9 @@
 " Last Change: May 20, 2013
 " URL: http://peterodding.com/code/vim/publish/
 
-let g:xolox#publish#version = '1.7.12'
+let g:xolox#publish#version = '1.7.13'
 
-call xolox#misc#compat#check('publish.vim', g:xolox#publish#version, 7)
+call xolox#misc#compat#check('publish.vim', g:xolox#publish#version, 9)
 
 function! xolox#publish#resolve_files(directory, pathnames) " {{{1
   " Create a dictionary that maps the fully resolved pathnames of the files to
